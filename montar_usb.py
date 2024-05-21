@@ -1,8 +1,9 @@
+
 import os
 import pyudev
 import subprocess as sp
 import vlc
-import time 
+import time
 
 
 def print_dev_stats(path):
@@ -28,17 +29,29 @@ def get_mount_point(path):
 
 def reproducir_presentacion(fotos):
         for image in fotos:
-            player=vlc.MediaPlayer(image)
-            player.play()
-            time.sleep(3)
-            player.stop()
+                player=vlc.MediaPlayer(image)
+                player.play()
+                time.sleep(3)
+                player.stop()
 
-       
+
 def reproducir_musica(music_path):
-        player = vlc.MediaPlayer(music_path)
-        player.play()
-        while True:
-                pass
+        #player = vlc.MediaPlayer(music_path)
+        #player.play()
+        #while True:
+        #        pass
+        for song in music_path:
+                player=vlc.MediaPlayer(song)
+                player.play()
+                time.sleep(3)
+                player.stop()
+
+def reproducir_video(video):
+        media = vlc.Media(video)
+        media_player.set_media(media)
+        media_player.play()
+
+
 
 
 
@@ -50,7 +63,7 @@ def main_vlc():
 
 
     mp=''
-    while mp!='':
+    while mp=='':
             action, device = monitor.receive_device()
             if action != "add":
                     continue
@@ -59,7 +72,7 @@ def main_vlc():
             mp = get_mount_point("/dev/" + device.sys_name)
             print("Mount point: {}".format(mp))
             print_dev_stats(mp)
-    return mp   
+    return mp
 
 
 
