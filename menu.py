@@ -106,12 +106,9 @@ def mostrar_mensaje(stdscr, opcion_elegida):
 
         elif opcion_elegida == ord('3'):
                 subopcion_elegida=None
-                #while subopcion
-
+                mp=''
                 print("\n Por favor conecte una usb")
                 mp=main_vlc()
-
-
                 """
                 fotos=int(len(numero_arch[0]))
                 videos=int(len(numero_arch[1]))
@@ -122,17 +119,151 @@ def mostrar_mensaje(stdscr, opcion_elegida):
                 elif videos>0:
                         print("se van a desplegar videos")
                 """
+                medios=[]
                 if any(file.endswith((".jpg", ".png")) for file in os.listdir(mp)):
-                        fotos = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".jpg", ".png"))]
-                        reproducir_presentacion(fotos)
+                        medios.append("imagenes")
+                if any(file.endswith((".mp3", ".wav")) for file in os.listdir(mp)):
+                        medios.append("audio")
+                if any(file.endswith((".mp4", ".avi")) for file in os.listdir(mp)):
+                        medios.append("video")
 
 
-                elif any(file.endswith((".mp3", ".wav")) for file in os.listdir(mp)):
-                        music = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".mp3", ".wav"))]
-                        if music:
-                                reproducir_musica(music[0])
-                                input()
+                if len(medios)==0:
+                        print("NINGUNO DE LOS FORMATOS ES REPRODUCIBLE")
+                elif len(medios)==1:
+                        if medios[0]=="imagenes":
+                                fotos = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".jpg", ".png"))]
+                                reproducir_presentacion(fotos)
 
+
+                        elif medios[0]=="audio":
+                                music = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".mp3", ".wav"))]
+                                if music:
+                                        reproducir_musica(music)
+                        elif medios[0]=="video":
+                                #video = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".mp4", ".avi"))]
+                                #reproducir_video(video)
+                                medios = [f for f in os.listdir(mp) if f.endswith((".mp4", ".avi"))]
+                                stdscr.addstr(0, 0, "Seleccione el video que quiere ver:")
+                                for i, medio in enumerate(medios):
+                                        stdscr.addstr(i+1, 0, f"{i+1}. {medio}")
+
+                                selection = 0
+                                selected_option = None  # Variable para guardar la opción seleccionada
+
+                                # Maneja las teclas de flecha hacia arriba y hacia abajo
+                                key = stdscr.getch()
+                                while True:  # Mantén el menú abierto hasta que se presione Enter
+                                        if key == curses.KEY_UP and selection > 0:
+                                                selection -= 1
+                                        elif key == curses.KEY_DOWN and selection < len(medios) - 1:
+                                                selection += 1
+                                        elif key == curses.KEY_ENTER or key in [10, 13]:  # Valores ASCII para Enter
+                                                selected_option = medios[selection]
+                                                stdscr.addstr(1, 0, f"\nHas seleccionado: {selected_option}\n")  # Muestra la opción seleccionada
+                                                stdscr.refresh()  # Asegura que el mensaje se muestre en la pantalla
+                                                stdscr.getch()  # Espera a que el usuario presione cualquier tecla para continuar
+                                                reproducir_video(os.path.join(mp, selected_option))
+
+                                                break  # Finaliza el bucle para salir del menú
+
+                                        # Actualiza la selección mostrada
+                                        stdscr.clear()
+                                        stdscr.addstr(0, 0, "Seleccione el video que quiere ver:")
+                                        for i, medio in enumerate(medios):
+                                                if i == selection:
+                                                        stdscr.addstr(i+1, 0, f"> {i+1}. {medio}")  # Resalta la opción seleccionada
+                                                else:
+                                                        stdscr.addstr(i+1, 0, f"  {i+1}. {medio}")
+
+                                        stdscr.refresh()  # Refresca la pantalla
+                                        key = stdscr.getch()
+
+
+                elif len(medios)>1:
+
+                        stdscr.addstr(0, 0, "La memoria puede reproducir archivos de tipo:")
+                        for i, medio in enumerate(medios):
+                                stdscr.addstr(i+1, 0, f"{i+1}. {medio}")
+
+                        selection = 0
+                        selected_option = None  # Variable para guardar la opción seleccionada
+
+                        # Maneja las teclas de flecha hacia arriba y hacia abajo
+                        key = stdscr.getch()
+                        while True:  # Mantén el menú abierto hasta que se presione Enter
+                                if key == curses.KEY_UP and selection > 0:
+                                        selection -= 1
+                                elif key == curses.KEY_DOWN and selection < len(medios) - 1:
+                                        selection += 1
+                                elif key == curses.KEY_ENTER or key in [10, 13]:  # Valores ASCII para Enter
+                                        selected_option = medios[selection]
+                                        stdscr.addstr(1, 0, f"\nHas seleccionado: {selected_option}\n")  # Muestra la opción seleccionada
+                                        stdscr.refresh()  # Asegura que el mensaje se muestre en la pantalla
+                                        stdscr.getch()  # Espera a que el usuario presione cualquier tecla para continuar
+                                        if selected_option=="imagenes":
+                                                fotos = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".jpg", ".png"))]
+                                                reproducir_presentacion(fotos)
+
+
+                                        elif selected_option=="audio":
+                                                music = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".mp3", ".wav"))]
+                                                if music:
+                                                        reproducir_musica(music[0])
+                                        elif selected_option=="video":
+                                #video = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".mp4", ".avi"))]
+                                #reproducir_video(video)
+                                                medios_v = [f for f in os.listdir(mp) if f.endswith((".mp4", ".avi"))]
+                                                stdscr.addstr(0, 0, "Seleccione el video que quiere ver:")
+                                                for i, medio in enumerate(medios_v):
+                                                        stdscr.addstr(i+1, 0, f"{i+1}. {medio}")
+
+                                                selection = 0
+                                                selected_option = None  # Variable para guardar la opción seleccionada
+
+                                # Maneja las teclas de flecha hacia arriba y hacia abajo
+                                                key = stdscr.getch()
+                                                while True:  # Mantén el menú abierto hasta que se presione Enter
+                                                        if key == curses.KEY_UP and selection > 0:
+                                                                selection -= 1
+                                                        elif key == curses.KEY_DOWN and selection < len(medios) - 1:
+                                                                selection += 1
+                                                        elif key == curses.KEY_ENTER or key in [10, 13]:  # Valores ASCII para Enter
+                                                                selected_option = medios_v[selection]
+                                                                stdscr.addstr(1, 0, f"\nHas seleccionado: {selected_option}\n")  # Muestra la opción seleccionada
+                                                                stdscr.refresh()  # Asegura que el mensaje se muestre en la pantalla
+                                                                stdscr.getch()  # Espera a que el usuario presione cualquier tecla para continuar
+                                                                reproducir_video(os.path.join(mp, selected_option))
+
+                                                                break  # Finaliza el bucle para salir del menú
+
+                                        # Actualiza la selección mostrada
+                                                        stdscr.clear()
+                                                        stdscr.addstr(0, 0, "Seleccione el video que quiere ver:")
+                                                        for i, medio in enumerate(medios_v):
+                                                                if i == selection:
+                                                                        stdscr.addstr(i+1, 0, f"> {i+1}. {medio}")  # Resalta la opción seleccionada
+                                                                else:
+                                                                        stdscr.addstr(i+1, 0, f"  {i+1}. {medio}")
+
+                                                        stdscr.refresh()  # Refresca la pantalla
+                                                        key = stdscr.getch()
+
+
+                                        break  # Finaliza el bucle para salir del menú
+
+                                # Actualiza la selección mostrada
+                                stdscr.clear()
+                                stdscr.addstr(0, 0, "La memoria puede reproducir archivos de tipo:")
+                                for i, medio in enumerate(medios):
+                                        if i == selection:
+                                                stdscr.addstr(i+1, 0, f"> {i+1}. {medio}")  # Resalta la opción seleccionada
+                                        else:
+                                                stdscr.addstr(i+1, 0, f"  {i+1}. {medio}")
+
+                                stdscr.refresh()  # Refresca la pantalla
+                                key = stdscr.getch()
+##############################
 
 
         elif opcion_elegida == ord('8'):
@@ -151,7 +282,6 @@ def main(stdscr):
                 opcion_elegida = mostrar_menu(stdscr)
                 if not mostrar_mensaje(stdscr, opcion_elegida):
                         break
-
 if __name__=="__main__":
         curses.wrapper(main)
 
