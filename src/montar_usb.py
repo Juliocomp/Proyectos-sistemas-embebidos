@@ -1,9 +1,13 @@
-
+#Interfaz Kiosco Multimedia
+#Autores: Ramirez Andres Daniela, Gonzalez Aguilar Julio Cesar
+#Fecha: 28 de Mayo de 2024
+#Descripcion: Montar una USB en RaspbianOS
+#Licencia: MIT
 import os
 import pyudev
 import subprocess as sp
 import vlc
-import time
+import time 
 
 
 def print_dev_stats(path):
@@ -31,10 +35,10 @@ def reproducir_presentacion(fotos):
         for image in fotos:
                 player=vlc.MediaPlayer(image)
                 player.play()
-                time.sleep(3)
+                time.sleep(5)
                 player.stop()
 
-
+       
 def reproducir_musica(music_path):
         #player = vlc.MediaPlayer(music_path)
         #player.play()
@@ -43,13 +47,17 @@ def reproducir_musica(music_path):
         for song in music_path:
                 player=vlc.MediaPlayer(song)
                 player.play()
-                time.sleep(3)
+                time.sleep(15)
                 player.stop()
 
 def reproducir_video(video):
-        media = vlc.Media(video)
-        media_player.set_media(media)
-        media_player.play()
+	
+	for x in video:	
+        	media = vlc.MediaPlayer(x)
+        	#media_player.set_media(media)
+        	media.play()
+        	time.sleep(10)
+        	media.stop()
 
 
 
@@ -59,7 +67,7 @@ def main_vlc():
     context = pyudev.Context()
     monitor = pyudev.Monitor.from_netlink(context)
     monitor.filter_by(subsystem="block", device_type="partition")
-    #while True:
+    
 
 
     mp=''
@@ -72,16 +80,5 @@ def main_vlc():
             mp = get_mount_point("/dev/" + device.sys_name)
             print("Mount point: {}".format(mp))
             print_dev_stats(mp)
-    return mp
+    return mp   
 
-
-
-    if any(file.endswith((".jpg", ".png")) for file in os.listdir(mp)):
-            fotos = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".jpg", ".png"))]
-            reproducir_presentacion(fotos)
-
-
-    elif any(file.endswith((".mp3", ".wav")) for file in os.listdir(mp)):
-            music = [os.path.join(mp, f) for f in os.listdir(mp) if f.endswith((".mp3", ".wav"))]
-            if music:
-                    reproducir_musica(music[0])
